@@ -12,7 +12,7 @@ import java.util.*;
 public class Main {
                private static List<String> log = new ArrayList<>();
                private static final int MIN_TABLE_WIDTH = 80;
-               private static final String case_path = "test_case_1.txt";
+               private static final String case_path = "Test Cases/test_case_1.txt";
 
                public static void main(String[] args) {
                               Library library = new Library();
@@ -96,6 +96,9 @@ public class Main {
                               System.out.printf(formatString, "2. Remove Book by ID");
                               System.out.printf(formatString, "3. List All Books");
                               System.out.printf(formatString, "4. Exit Program");
+                              //Used to debug if JAVA was recognizing correct directory for Test Cases
+                                   //System.out.println("Working Directory = " + System.getProperty("user.dir"));
+
 							  
                }
                /**displayHeader
