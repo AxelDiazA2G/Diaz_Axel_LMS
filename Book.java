@@ -1,7 +1,7 @@
 import java.util.HashMap;
 
 /**Axel Diaz | CEN 3024C Software Development | - CRN: 17125
- * Main
+ * Book
  * Represents a book with attributes such as ID, title, and author.
  */
 public class Book {
