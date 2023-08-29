@@ -193,7 +193,7 @@ public class Library {
                               return null; // Return null if the index is out of bounds
                }
 
-               /**
+               /**getTotalBooks
                 * Gets the total number of books in the library.
                 *
                 * @return The total number of books.
