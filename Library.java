@@ -3,7 +3,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 /**Axel Diaz | CEN 3024C Software Development | - CRN: 17125
- * Main
+ * Library
  * The Library class represents a collection of books and provides methods 
  * for managing this collection. It serves as the core data structure in a 
  * Library Management System. The class allows for adding books from a file, 
