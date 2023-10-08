@@ -1,4 +1,5 @@
 # 📚 Library Management System (LMS) By Axel Diaz
+# Phase 1
 
 ## 🎯 Objective and Description
 The Library Management System (LMS) aims to streamline the operations of a library by automating the management of its book collection. Designed as a console-based application, the LMS empowers librarians to efficiently add or remove books and allows readers to browse the collection. The system adheres to specific constraints, such as utilizing a text-file format for book data, to ensure ease of use and scalability.
@@ -6,9 +7,10 @@ The Library Management System (LMS) aims to streamline the operations of a libra
 ## 🌟 Key Features
 
 - 📖 **Add New Books**: Import from text file with unique ID, title, and author.
-- 🗑️ **Remove Books**: By unique ID.
+- 🗑️ **Remove Books**: By unique Barcode.
 - 📑 **List Books**: View entire collection.
-
+- ☑️ **Check out book**: Take a book
+- ✅ **Check in book**: Deliver a book
 ---
 
 ## 👥 User Roles
@@ -32,7 +34,7 @@ The Library Management System (LMS) aims to streamline the operations of a libra
 
 ## 📚 Book Class
 
-- 🏷️ **Attributes**: ID, title, author.
+- 🏷️ **Attributes**: Barcode, title, author.
 - 🛠️ **Methods**: Getters, setters, and basic algorithms.
 
 ## 📚 Library Class
@@ -41,7 +43,8 @@ The Library Management System (LMS) aims to streamline the operations of a libra
   - Add/remove books
   - List books
   - Handle text files
-
+  - Sort
+  - Search
 ---
 
 ## 🖥️ Main Program
