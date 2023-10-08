@@ -19,7 +19,7 @@ public class Main {
                               Scanner scanner = new Scanner(System.in);
                               addBooksFromFile(library, scanner);
                               int dynamicWidth = MIN_TABLE_WIDTH;
-
+                              
                               while (true) {
                                              dynamicWidth = calculateDynamicWidth(library);
                                              clearScreen();

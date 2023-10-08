@@ -2,26 +2,26 @@ import java.util.HashMap;
 
 /**Axel Diaz | CEN 3024C Software Development | - CRN: 17125
  * Book
- * Represents a book with attributes such as ID, title, and author.
+ * Represents a book with attributes such as barcode, title, and author.
  */
 public class Book {
-               private int id;
+               private int barcode;
                private String title;
                private String author;
-
+               private boolean checkOutStatus;
               
-               public Book(int id, String title, String author) {
-                              this.id = id;
+               public Book(int barcode, String title, String author) {
+                              this.barcode = barcode;
                               this.title = title;
                               this.author = author;
                }
 
                /**
-                * Gets the ID of the book.
+                * Gets the barcode of the book.
                 *
-                * @return The book's ID.
+                * @return The book's barcode.
                 */
-               public int getId() { return id; }
+               public int getId() { return barcode; }
 
                /**
                 * Gets the title of the book.
@@ -36,6 +36,13 @@ public class Book {
                 * @return The book's author.
                 */
                public String getAuthor() { return author; }
+
+               /**
+                * Gets the author of the book.
+                *
+                * @return The book's author.
+                */
+               public String getStatus() { return author; }
 
                /**
                 * Sets the title of the book.
@@ -58,7 +65,7 @@ public class Book {
                 */
                public HashMap<String, String> toDict() {
                               HashMap<String, String> dict = new HashMap<>();
-                              dict.put("id", String.valueOf(id));
+                              dict.put("barcode", String.valueOf(barcode));
                               dict.put("title", title);
                               dict.put("author", author);
                               return dict;
@@ -67,11 +74,11 @@ public class Book {
                /**
                 * Provides a string representation of the book.
                 *
-                * @return A string containing the book's ID, title, and author.
+                * @return A string containing the book's barcode, title, and author.
                 */
                @Override
                public String toString() {
-                              return "ID: " + id + ", Title: " + title + ", Author: " + author;
+                              return "barcode: " + barcode + ", Title: " + title + ", Author: " + author;
                }
 
                /**
@@ -80,5 +87,5 @@ public class Book {
                 * @param other The other book to compare with.
                 * @return True if the IDs are equal, otherwise false.
                 */
-               public boolean equals(Book other) { return this.id == other.id; }
+               public boolean equals(Book other) { return this.barcode == other.barcode; }
 }
