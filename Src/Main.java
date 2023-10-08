@@ -364,43 +364,51 @@ public class Main {
                                              logMessage("[ERROR]", "Failed to remove book. Barcode may not exist.");
                               }
                }
-               /**
-                * Changes the status book from the library by Barcode.
-                *
-                * @param library The library instance.
-                * @param scanner The scanner for user input.
-                */
+               /**checkOutBookByTitle
+             * Checks out a book by title.
+             *
+             * This method allows a user to check out a book from the library by providing the book's title.
+             * It searches for the book by title, handles multiple matches, and performs the check-out operation.
+             *
+             * @param library  The Library object representing the library's database.
+             * @param scanner  The Scanner for user input.
+             */
                 private static void checkOutBookByTitle(Library library, Scanner scanner) {
+                    // Prompt the user to enter the book title they want to check out.
                     System.out.print("Enter book Title to Check Out: ");
                     String title = scanner.nextLine();
                 
-                    // Search for the book by title
+                    // Search for the book by title and retrieve exact and close matches.
                     Map<String, List<Integer>> searchResults = library.searchByTitle(title);
                     List<Integer> exactMatches = searchResults.get("exact");
                     List<Integer> closeMatches = searchResults.get("close");
                 
-                    // Remove books that are already checked out
+                    // Remove books that are already checked out from the exact matches.
                     exactMatches.removeIf(barcode -> {
-                         Book book = library.getBookByBarcode(barcode);
-                         return book != null && book.getStatus();
-                     });
-                     
-                     closeMatches.removeIf(barcode -> {
-                         Book book = library.getBookByBarcode(barcode);
-                         return book != null && book.getStatus();
-                     });
-                     
+                        Book book = library.getBookByBarcode(barcode);
+                        // Check if the book exists and is currently checked out.
+                        return book != null && book.getStatus();
+                    });
+                
+                    // Remove books that are already checked out from the close matches.
+                    closeMatches.removeIf(barcode -> {
+                        Book book = library.getBookByBarcode(barcode);
+                        // Check if the book exists and is currently checked out.
+                        return book != null && book.getStatus();
+                    });
                 
                     if (!exactMatches.isEmpty()) {
                         if (exactMatches.size() == 1) {
+                            // If there is only one exact match, check it out.
                             int barcode = exactMatches.get(0);
-                            if (library.changeBookStatus(barcode, true)) {
+                            if (library.changeBookStatus(library.getIndexByBarcode(barcode), true)) {
                                 logMessage("[INFO]", "Book checked out successfully!");
                                 return;
                             } else {
                                 logMessage("[ERROR]", "Failed to check out book. Please try again later.");
                             }
                         } else {
+                            // If there are multiple exact matches, prompt the user to choose one.
                             System.out.println("Multiple exact matches found. Barcodes: " + exactMatches.toString());
                             System.out.print("Enter the Barcode of the book you want to check out, or type 'cancel' to cancel: ");
                             String input = scanner.nextLine();
@@ -413,6 +421,7 @@ public class Main {
                             try {
                                 int chosenBarcode = Integer.parseInt(input);
                                 if (exactMatches.contains(chosenBarcode)) {
+                                    // Check out the chosen book by its barcode.
                                     if (library.changeBookStatus(library.getIndexByBarcode(chosenBarcode), true)) {
                                         logMessage("[INFO]", "Book checked out successfully!");
                                         return;
@@ -427,6 +436,7 @@ public class Main {
                             }
                         }
                     } else if (!closeMatches.isEmpty()) {
+                        // If there are close matches, prompt the user to choose from them.
                         System.out.println("Multiple close matches found. Barcodes: " + closeMatches.toString());
                         System.out.print("Enter the Barcode of the book you want to check out from the close matches, or type 'cancel' to cancel: ");
                         String input = scanner.nextLine();
@@ -439,6 +449,7 @@ public class Main {
                         try {
                             int chosenBarcode = Integer.parseInt(input);
                             if (closeMatches.contains(chosenBarcode)) {
+                                // Check out the chosen book from the close matches by its barcode.
                                 if (library.changeBookStatus(library.getIndexByBarcode(chosenBarcode), true)) {
                                     logMessage("[INFO]", "Book checked out successfully!");
                                 } else {
@@ -451,41 +462,57 @@ public class Main {
                             logMessage("[ERROR]", "Invalid input. Please enter a valid Barcode.");
                         }
                     } else {
+                        // If no matches were found, inform the user.
                         logMessage("[INFO]", "No available books with that title at this time.");
                     }
                 }
+                
 
+                /**checkInBookByTitle
+                 * Checks in a book by title.
+                 *
+                 * This method allows a user to check in a book to the library by providing the book's title.
+                 * It searches for the book by title, handles multiple matches, and performs the check-in operation.
+                 *
+                 * @param library  The Library object representing the library's database.
+                 * @param scanner  The Scanner for user input.
+                 */
                 private static void checkInBookByTitle(Library library, Scanner scanner) {
+                    // Prompt the user to enter the book title they want to check in.
                     System.out.print("Enter book Title to Check In: ");
                     String title = scanner.nextLine();
                 
-                    // Search for the book by title
+                    // Search for the book by title and retrieve exact and close matches.
                     Map<String, List<Integer>> searchResults = library.searchByTitle(title);
                     List<Integer> exactMatches = searchResults.get("exact");
                     List<Integer> closeMatches = searchResults.get("close");
                 
-                    // Remove books that are already checked out
+                    // Remove books that are already checked in from the exact matches.
                     exactMatches.removeIf(barcode -> {
-                         Book book = library.getBookByBarcode(barcode);
-                         return book != null && !book.getStatus();
-                     });
-                     
-                     closeMatches.removeIf(barcode -> {
-                         Book book = library.getBookByBarcode(barcode);
-                         return book != null && !book.getStatus();
-                     });
-                     
+                        Book book = library.getBookByBarcode(barcode);
+                        // Check if the book exists and is currently checked in.
+                        return book != null && !book.getStatus();
+                    });
+                
+                    // Remove books that are already checked in from the close matches.
+                    closeMatches.removeIf(barcode -> {
+                        Book book = library.getBookByBarcode(barcode);
+                        // Check if the book exists and is currently checked in.
+                        return book != null && !book.getStatus();
+                    });
                 
                     if (!exactMatches.isEmpty()) {
                         if (exactMatches.size() == 1) {
+                            // If there is only one exact match, check it in.
                             int barcode = exactMatches.get(0);
-                            if (library.changeBookStatus(barcode, true)) {
+                            if (library.changeBookStatus(library.getIndexByBarcode(barcode), false)) {
                                 logMessage("[INFO]", "Book checked in successfully!");
                                 return;
                             } else {
                                 logMessage("[ERROR]", "Failed to check in book. Please try again later.");
                             }
                         } else {
+                            // If there are multiple exact matches, prompt the user to choose one.
                             System.out.println("Multiple exact matches found. Barcodes: " + exactMatches.toString());
                             System.out.print("Enter the Barcode of the book you want to check in, or type 'cancel' to cancel: ");
                             String input = scanner.nextLine();
@@ -498,6 +525,7 @@ public class Main {
                             try {
                                 int chosenBarcode = Integer.parseInt(input);
                                 if (exactMatches.contains(chosenBarcode)) {
+                                    // Check in the chosen book by its barcode.
                                     if (library.changeBookStatus(library.getIndexByBarcode(chosenBarcode), false)) {
                                         logMessage("[INFO]", "Book checked in successfully!");
                                         return;
@@ -512,6 +540,7 @@ public class Main {
                             }
                         }
                     } else if (!closeMatches.isEmpty()) {
+                        // If there are close matches, prompt the user to choose from them.
                         System.out.println("Multiple close matches found. Barcodes: " + closeMatches.toString());
                         System.out.print("Enter the Barcode of the book you want to check in from the close matches, or type 'cancel' to cancel: ");
                         String input = scanner.nextLine();
@@ -524,6 +553,7 @@ public class Main {
                         try {
                             int chosenBarcode = Integer.parseInt(input);
                             if (closeMatches.contains(chosenBarcode)) {
+                                // Check in the chosen book from the close matches by its barcode.
                                 if (library.changeBookStatus(library.getIndexByBarcode(chosenBarcode), false)) {
                                     logMessage("[INFO]", "Book checked in successfully!");
                                 } else {
@@ -536,9 +566,11 @@ public class Main {
                             logMessage("[ERROR]", "Invalid input. Please enter a valid Barcode.");
                         }
                     } else {
+                        // If no matches were found, inform the user.
                         logMessage("[INFO]", "No available books with that title at this time.");
                     }
                 }
+                
                 
                 
 

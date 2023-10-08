@@ -142,6 +142,18 @@ public class Library {
                               return initialSize > newSize; // Return true if a book was removed, false otherwise
                }
 
+
+               /**changeBookStatus
+ * Changes the status of a book with the given barcode.
+ *
+ * This method updates the status of a book in the library's database by specifying its barcode.
+ * If the status provided is different from the current status, it updates the status and returns true,
+ * indicating a successful status change. Otherwise, it returns false.
+ *
+ * @param barcode The barcode of the book to change the status for.
+ * @param status  The new status to set (true for checked out, false for checked in).
+ * @return True if the status change was successful, false otherwise.
+ */
                public boolean changeBookStatus(int barcode,boolean status){
                             if (books.get(barcode).getStatus() != status){
                                 books.get(barcode).setStatus(status);
@@ -150,6 +162,16 @@ public class Library {
                             return false;
                }
 
+
+               /**searchByTitle
+ * Searches for books by title.
+ *
+ * This method searches the library's database for books with titles matching the given targetTitle.
+ * It returns a map containing two lists: "exact" matches and "close" matches based on title similarity.
+ *
+ * @param targetTitle The title to search for.
+ * @return A map containing "exact" and "close" matches by barcode.
+ */
                public Map<String, List<Integer>> searchByTitle(String targetTitle) {
                 Map<String, List<Integer>> resultMap = new HashMap<>();
                 List<Integer> closeMatches = new ArrayList<>();
@@ -172,11 +194,16 @@ public class Library {
             }
             
             
-
+/**sortByTitle
+ * Sorts the list of books by title in non-decreasing order.
+ */
                public void sortByTitle() {
                 mergeSort(0, books.size() - 1);
             }
             
+            /**mergeSort
+ * Sorts the list of books by title in non-decreasing order.
+ */
             private void mergeSort(int left, int right) {
                 if (left < right) {
                     int mid = (left + right) / 2;
@@ -190,6 +217,13 @@ public class Library {
                 }
             }
             
+            /**merge
+ * Merges two sub-arrays into a single sorted array.
+ *
+ * @param left  The left index of the first sub-array.
+ * @param mid   The middle index dividing the two sub-arrays.
+ * @param right The right index of the second sub-array.
+ */
             private void merge(int left, int mid, int right) {
                 // Calculate the sizes of the two sub-arrays to be merged
                 int n1 = mid - left + 1;
