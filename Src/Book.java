@@ -8,12 +8,13 @@ public class Book {
                private int barcode;
                private String title;
                private String author;
-               private boolean checkOutStatus;
+               private boolean status;
               
                public Book(int barcode, String title, String author) {
                               this.barcode = barcode;
                               this.title = title;
                               this.author = author;
+                              this.status = false;
                }
 
                /**
@@ -42,7 +43,7 @@ public class Book {
                 *
                 * @return The book's author.
                 */
-               public String getStatus() { return author; }
+               public boolean getStatus() { return status; }
 
                /**
                 * Sets the title of the book.
@@ -59,6 +60,13 @@ public class Book {
                public void setAuthor(String author) { this.author = author; }
 
                /**
+                * Sets the status of the book.
+                *
+                * @param author The new author.
+                */
+               public void setStatus(boolean status) { this.status = status; }
+
+               /**
                 * Converts the book attributes to a dictionary representation.
                 *
                 * @return A HashMap containing the book's attributes.
@@ -68,6 +76,7 @@ public class Book {
                               dict.put("barcode", String.valueOf(barcode));
                               dict.put("title", title);
                               dict.put("author", author);
+                              dict.put("status",String.valueOf(status));
                               return dict;
                }
 
@@ -78,7 +87,7 @@ public class Book {
                 */
                @Override
                public String toString() {
-                              return "barcode: " + barcode + ", Title: " + title + ", Author: " + author;
+                              return "barcode: " + barcode + ", Title: " + title + ", Author: " + author + ", Checked Out? :" + status;
                }
 
                /**

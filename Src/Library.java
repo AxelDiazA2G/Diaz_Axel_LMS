@@ -142,6 +142,127 @@ public class Library {
                               return initialSize > newSize; // Return true if a book was removed, false otherwise
                }
 
+               public boolean changeBookStatus(int barcode,boolean status){
+                            if (books.get(barcode).getStatus() != status){
+                                books.get(barcode).setStatus(status);
+                                return true;
+                            }
+                            return false;
+               }
+
+               public Map<String, List<Integer>> searchByTitle(String targetTitle) {
+                Map<String, List<Integer>> resultMap = new HashMap<>();
+                List<Integer> closeMatches = new ArrayList<>();
+                List<Integer> exactMatches = new ArrayList<>();
+            
+                for (Book book : books) {
+                    if (book.getTitle().equals(targetTitle)) {
+                        exactMatches.add(book.getId());
+                    } else {
+                        int distance = levenshteinDistance(book.getTitle(), targetTitle);
+                        if (distance <= 3) { 
+                            closeMatches.add(book.getId());
+                        }
+                    }
+                }
+            
+                resultMap.put("exact", exactMatches);
+                resultMap.put("close", closeMatches);
+                return resultMap;
+            }
+            
+            
+
+               public void sortByTitle() {
+                mergeSort(0, books.size() - 1);
+            }
+            
+            private void mergeSort(int left, int right) {
+                if (left < right) {
+                    int mid = (left + right) / 2;
+            
+                    // Sort the left and right halves
+                    mergeSort(left, mid);
+                    mergeSort(mid + 1, right);
+            
+                    // Merge the sorted halves
+                    merge(left, mid, right);
+                }
+            }
+            
+            private void merge(int left, int mid, int right) {
+                // Calculate the sizes of the two sub-arrays to be merged
+                int n1 = mid - left + 1;
+                int n2 = right - mid;
+            
+                // Create temporary arrays to hold the values of the sub-arrays
+                ArrayList<Book> leftArray = new ArrayList<>();
+                ArrayList<Book> rightArray = new ArrayList<>();
+            
+                // Copy the values to the temporary arrays
+                for (int i = 0; i < n1; i++) {
+                    leftArray.add(books.get(left + i));
+                }
+                for (int j = 0; j < n2; j++) {
+                    rightArray.add(books.get(mid + 1 + j));
+                }
+            
+                // Merge the temporary arrays back into the original array
+                int i = 0, j = 0, k = left;
+                while (i < n1 && j < n2) {
+                    if (leftArray.get(i).getTitle().compareTo(rightArray.get(j).getTitle()) <= 0) {
+                        books.set(k, leftArray.get(i));
+                        i++;
+                    } else {
+                        books.set(k, rightArray.get(j));
+                        j++;
+                    }
+                    k++;
+                }
+            
+                // Copy any remaining elements in leftArray, if any
+                while (i < n1) {
+                    books.set(k, leftArray.get(i));
+                    i++;
+                    k++;
+                }
+            
+                // Copy any remaining elements in rightArray, if any
+                while (j < n2) {
+                    books.set(k, rightArray.get(j));
+                    j++;
+                    k++;
+                }
+            }
+
+
+            /**levenshteinDistance
+                * Flexible string comparison
+                *
+                * @param a     string a
+                * @param b   string b
+                */
+            private static int levenshteinDistance(String a, String b) {
+                int[][] dp = new int[a.length() + 1][b.length() + 1];
+            
+                for (int i = 0; i <= a.length(); i++) {
+                    for (int j = 0; j <= b.length(); j++) {
+                        if (i == 0) {
+                            dp[0][j] = j;
+                        } else if (j == 0) {
+                            dp[i][0] = i;
+                        } else {
+                            dp[i][j] = Math.min(Math.min(dp[i - 1][j - 1] + (a.charAt(i - 1) == b.charAt(j - 1) ? 0 : 1),
+                                    dp[i - 1][j] + 1),
+                                    dp[i][j - 1] + 1);
+                        }
+                    }
+                }
+            
+                return dp[a.length()][b.length()];
+            }
+            
+
                /**listAllBooks
                 * Lists all books with pagination.
                 *
@@ -156,6 +277,7 @@ public class Library {
                               int idWidth = String.valueOf(getMaxId()).length();
                               int titleWidth = getMaxTitleLength();
                               int authorWidth = getMaxAuthorLength();
+                              int statusWidth = 5;
 
                               // Adding 8 for the four '|' separators and spaces
                               int contentWidth = idWidth + titleWidth + authorWidth + 8;
@@ -169,17 +291,18 @@ public class Library {
                               }
 
                               // Create a format string that respects the dynamicWidth
-                              String rowFormat = "| %-" + idWidth + "s | %-" + (titleWidth + extraSpaceForTitle) + "s | %-" + (authorWidth + extraSpaceForAuthor) + "s |";
-
-                              for (int i = start; i < end; i++) {
-                                             Book book = books.get(i);
-                                             // Use String.format to ensure extra spaces are added at the correct positions
-                                             String formattedTitle = String.format("%-" + (titleWidth + extraSpaceForTitle) + "s", book.getTitle());
-                                             String formattedAuthor = String.format("%-" + (authorWidth + extraSpaceForAuthor) + "s", book.getAuthor());
-                                             System.out.printf(rowFormat, book.getId(), formattedTitle, formattedAuthor);
-                                             System.out.println();
-                              }
-               }
+                            String rowFormat = "| %-" + idWidth + "s | %-" + (titleWidth + extraSpaceForTitle) + "s | %-" + (authorWidth + extraSpaceForAuthor) + "s | %-" + statusWidth + "s |";
+                            
+                            for (int i = start; i < end; i++) {
+                                Book book = books.get(i);
+                                // Use String.format to ensure extra spaces are added at the correct positions
+                                String formattedTitle = String.format("%-" + (titleWidth + extraSpaceForTitle) + "s", book.getTitle());
+                                String formattedAuthor = String.format("%-" + (authorWidth + extraSpaceForAuthor) + "s", book.getAuthor());
+                                String formattedStatus = String.format("%-" + statusWidth + "s", String.valueOf(book.getStatus()));
+                                System.out.printf(rowFormat, book.getId(), formattedTitle, formattedAuthor, formattedStatus);
+                                System.out.println();
+                            }
+                        }
                /**getBookByIndex
                 * Gets a book by its index in the ArrayList.
                 *
@@ -192,6 +315,32 @@ public class Library {
                               }
                               return null; // Return null if the index is out of bounds
                }
+
+            /**getBookByBarcode
+                * Gets a book by its Barcode in the ArrayList.
+                *
+                * @param index The index of the book.
+                * @return The book, or {@code null} if the index is out of bounds.
+                */
+               public Book getBookByBarcode(int barcode) {
+                for (Book book : books) {
+                    if (book.getId() == barcode) {
+                        return book;
+                    }
+                }
+                return null; // Return null if no book with the given barcode is found
+            }
+
+            public Integer getIndexByBarcode(int barcode) {
+                for (int i = 0; i < books.size(); i++) {
+                    if (books.get(i).getId() == barcode) {
+                        return i; // Return the index of the book with the given barcode
+                    }
+                }
+                return null; // Return null if no book with the given barcode is found
+            }
+            
+            
 
                /**getTotalBooks
                 * Gets the total number of books in the library.
