@@ -6,8 +6,9 @@ The Library Management System (LMS) aims to streamline the operations of a libra
 ## 🌟 Key Features
 
 - 📖 **Add New Books**: Import from text file with unique ID, title, and author.
-- 🗑️ **Remove Books**: By unique ID.
+- 🗑️ **Remove Books**: By unique Barcode.
 - 📑 **List Books**: View entire collection.
+- ☑️ **Check out book**: Take a book
 
 ---
 
@@ -32,7 +33,7 @@ The Library Management System (LMS) aims to streamline the operations of a libra
 
 ## 📚 Book Class
 
-- 🏷️ **Attributes**: ID, title, author.
+- 🏷️ **Attributes**: Barcode, title, author.
 - 🛠️ **Methods**: Getters, setters, and basic algorithms.
 
 ## 📚 Library Class
@@ -41,7 +42,8 @@ The Library Management System (LMS) aims to streamline the operations of a libra
   - Add/remove books
   - List books
   - Handle text files
-
+  - Sort
+  - Search
 ---
 
 ## 🖥️ Main Program
