@@ -469,7 +469,7 @@ public class Main {
                             if (library.changeBookStatus(library.getIndexByBarcode(barcode), true)) {
                                 logMessage("[INFO]", "Book checked out successfully!");
                                 LocalDate today = LocalDate.now();
-                                library.getBookByBarcode(barcode).setDueDate(today.plusDays(7).toString());
+                                library.getBookByBarcode(barcode).setDueDate(today.plusDays(28).toString());
                                 return;
                             } else {
                                 logMessage("[ERROR]", "Failed to check out book. Please try again later.");
@@ -492,7 +492,7 @@ public class Main {
                                     if (library.changeBookStatus(library.getIndexByBarcode(chosenBarcode), true)) {
                                         logMessage("[INFO]", "Book checked out successfully!");
                                         LocalDate today = LocalDate.now();
-                                library.getBookByBarcode(chosenBarcode).setDueDate(today.plusDays(7).toString());
+                                library.getBookByBarcode(chosenBarcode).setDueDate(today.plusDays(28).toString());
                                         return;
                                     } else {
                                         logMessage("[ERROR]", "Failed to check out book. Please try again later.");
@@ -522,7 +522,7 @@ public class Main {
                                 if (library.changeBookStatus(library.getIndexByBarcode(chosenBarcode), true)) {
                                     logMessage("[INFO]", "Book checked out successfully!");
                                     LocalDate today = LocalDate.now();
-                                    library.getBookByBarcode(chosenBarcode).setDueDate(today.plusDays(7).toString());
+                                    library.getBookByBarcode(chosenBarcode).setDueDate(today.plusDays(28).toString());
                                 } else {
                                     logMessage("[ERROR]", "Failed to check out book. Please try again later.");
                                 }
