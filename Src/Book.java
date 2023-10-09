@@ -9,12 +9,14 @@ public class Book {
                private String title;
                private String author;
                private boolean status;
+               private String dueDate;
               
                public Book(int barcode, String title, String author) {
                               this.barcode = barcode;
                               this.title = title;
                               this.author = author;
                               this.status = false;
+                              this.dueDate="";
                }
 
                /**
@@ -45,6 +47,12 @@ public class Book {
                 */
                public boolean getStatus() { return status; }
 
+                 /**
+                * Gets the due date of the book when checked out.
+                *
+                * @return The book's due date.
+                */
+               public String getDueDate() { return dueDate; }
                /**
                 * Sets the title of the book.
                 *
@@ -62,9 +70,16 @@ public class Book {
                /**
                 * Sets the status of the book.
                 *
-                * @param author The new author.
+                * @param author The new status.
                 */
                public void setStatus(boolean status) { this.status = status; }
+
+               /**
+                * Sets the due date of the book.
+                *
+                * @param author The new status.
+                */
+               public void setDueDate(String dueDate) { this.dueDate = dueDate; }
 
                /**
                 * Converts the book attributes to a dictionary representation.
@@ -77,6 +92,7 @@ public class Book {
                               dict.put("title", title);
                               dict.put("author", author);
                               dict.put("status",String.valueOf(status));
+                              dict.put("dueDate",String.valueOf(dueDate));
                               return dict;
                }
 
@@ -87,7 +103,7 @@ public class Book {
                 */
                @Override
                public String toString() {
-                              return "barcode: " + barcode + ", Title: " + title + ", Author: " + author + ", Checked Out? :" + status;
+                              return "barcode: " + barcode + ", Title: " + title + ", Author: " + author + ", Checked Out? :" + status + "Due on : " + dueDate;
                }
 
                /**

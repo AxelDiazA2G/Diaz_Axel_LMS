@@ -308,13 +308,15 @@ public class Library {
                               int start = page * pageSize;
                               int end = Math.min(start + pageSize, books.size());
 
-                              int idWidth = String.valueOf(getMaxId()).length();
+                              int idWidth;
+                               if(String.valueOf(getMaxId()).length()>10){idWidth=String.valueOf(getMaxId()).length();}else{idWidth=7;};
                               int titleWidth = getMaxTitleLength();
                               int authorWidth = getMaxAuthorLength();
                               int statusWidth = 5;
+                              int dueDateWidth = 10;
 
                               // Adding 8 for the four '|' separators and spaces
-                              int contentWidth = idWidth + titleWidth + authorWidth + 8;
+                              int contentWidth = idWidth + titleWidth + authorWidth +statusWidth+dueDateWidth+ 8;
                               int remainingSpace = dynamicWidth - contentWidth;
 
                               int extraSpaceForTitle = remainingSpace / 2;
@@ -325,7 +327,7 @@ public class Library {
                               }
 
                               // Create a format string that respects the dynamicWidth
-                            String rowFormat = "| %-" + idWidth + "s | %-" + (titleWidth + extraSpaceForTitle) + "s | %-" + (authorWidth + extraSpaceForAuthor) + "s | %-" + statusWidth + "s |";
+                            String rowFormat = "| %-" + idWidth + "s | %-" + (titleWidth + extraSpaceForTitle) + "s | %-" + (authorWidth + extraSpaceForAuthor) + "s | %-" + statusWidth +"s | %-"+dueDateWidth +"s |";
                             
                             for (int i = start; i < end; i++) {
                                 Book book = books.get(i);
@@ -333,7 +335,8 @@ public class Library {
                                 String formattedTitle = String.format("%-" + (titleWidth + extraSpaceForTitle) + "s", book.getTitle());
                                 String formattedAuthor = String.format("%-" + (authorWidth + extraSpaceForAuthor) + "s", book.getAuthor());
                                 String formattedStatus = String.format("%-" + statusWidth + "s", String.valueOf(book.getStatus()));
-                                System.out.printf(rowFormat, book.getId(), formattedTitle, formattedAuthor, formattedStatus);
+                                String formattedDueDate = String.format("%-" + dueDateWidth + "s", book.getDueDate());
+                                System.out.printf(rowFormat, book.getId(), formattedTitle, formattedAuthor, formattedStatus,formattedDueDate);
                                 System.out.println();
                             }
                         }

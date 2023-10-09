@@ -1,4 +1,5 @@
 import java.io.*;
+import java.time.LocalDate;
 import java.util.*;
 
 
@@ -38,7 +39,7 @@ public class Main {
                                 addBooksFromFile(library, scanner, dynamicWidth, initialChoice);
                                 break;
                             case 2:
-                                removeBookById(library, scanner);
+                                removeBook(library, scanner);
                                 break;
                             case 3:
                                 listAllBooks(library, scanner, dynamicWidth);
@@ -102,7 +103,7 @@ public class Main {
                               String formatString = "| %-" + (tableWidth - 2) + "s|\n";
                               System.out.printf(formatString, "Menu Options");
                               System.out.printf(formatString, "1. Import Books from a File");
-                              System.out.printf(formatString, "2. Remove Book by Barcode");
+                              System.out.printf(formatString, "2. Remove Book");
                               System.out.printf(formatString, "3. List All Books");
                               System.out.printf(formatString, "4. Check Out Book");
                               System.out.printf(formatString, "5. Check In Book");
@@ -196,13 +197,14 @@ public class Main {
                               int barcodeWidth = maxIdLength;
                               int titleWidth = maxTitleLength;
                               int authorWidth = maxAuthorLength;
-                              int statusWidth = 10;
+                              int statusWidth = 6;
+                              int dateWidth = 10;
 
                               // Calculate the width of the separators and spaces
                               int separatorWidth = 9;  // 5 separators '|' and 4 spaces ' '
 
                               // Calculate the total required width
-                              int requiredWidth = barcodeWidth + titleWidth + authorWidth + statusWidth + separatorWidth;
+                              int requiredWidth = barcodeWidth + titleWidth + authorWidth + statusWidth +dateWidth+ separatorWidth;
 
                               // Calculate extra spaces needed to fill the dynamic table width
                               int extraSpaces = dynamicWidth - requiredWidth;
@@ -221,7 +223,7 @@ public class Main {
                               authorWidth += extraSpacesForAuthor;
 
                               // Create the row format
-                              String rowFormat = "| %-" + barcodeWidth + "s | %-" + titleWidth + "s | %-" + authorWidth + "s | %-" + statusWidth + "s |\n";
+                              String rowFormat = "| %-" + barcodeWidth + "s | %-" + titleWidth + "s | %-" + authorWidth + "s | %-" + statusWidth +"s | %-"+dateWidth+ "s |\n";
                               int tableWidth = Math.max(dynamicWidth, requiredWidth);
 
                               while (true) {
@@ -229,7 +231,7 @@ public class Main {
                                              displayHeader(dynamicWidth);
                                              displayMenu(dynamicWidth);
                                              displayLog(dynamicWidth);
-											 String title = String.format(rowFormat, "Barcode", "Title", "Author", "Status");
+											 String title = String.format(rowFormat, "Barcode", "Title", "Author", "Status","Due Date");
                                              System.out.printf("%-" + (tableWidth - 3) + "s", title);
 											 //Top-Bottom Border
                                              System.out.println("+"
@@ -353,17 +355,80 @@ public class Main {
                 * @param library The library instance.
                 * @param scanner The scanner for user input.
                 */
-               private static void removeBookById(Library library, Scanner scanner) {
-                              System.out.print("Enter book Barcode to remove: ");
-                              int Barcode = scanner.nextInt();
-                              scanner.nextLine();
-                              boolean isRemoved = library.removeBookById(Barcode);
-                              if (isRemoved) {
-                                             logMessage("[INFO]", "Book removed successfully!");
-                              } else {
-                                             logMessage("[ERROR]", "Failed to remove book. Barcode may not exist.");
-                              }
-               }
+                private static void removeBook(Library library, Scanner scanner) {
+                    System.out.println("Would you like to remove a book by:");
+                    System.out.println("1. Barcode");
+                    System.out.println("2. Title");
+                    System.out.print("Enter your choice (1/2): ");
+                    int choice = scanner.nextInt();
+                    scanner.nextLine();
+                
+                    if (choice == 1) {
+                        // Remove by Barcode
+                        System.out.print("Enter book Barcode to remove: ");
+                        int barcode = scanner.nextInt();
+                        scanner.nextLine();
+                        boolean isRemoved = library.removeBookById(barcode);
+                        if (isRemoved) {
+                            logMessage("[INFO]", "Book removed successfully!");
+                        } else {
+                            logMessage("[ERROR]", "Failed to remove book. Barcode may not exist.");
+                        }
+                    } else if (choice == 2) {
+                        // Remove by Title
+                        System.out.print("Enter book Title to remove: ");
+                        String title = scanner.nextLine();
+                
+                        // Search for the book by title
+                        Map<String, List<Integer>> searchResults = library.searchByTitle(title);
+                        List<Integer> exactMatches = searchResults.get("exact");
+                        List<Integer> closeMatches = searchResults.get("close");
+                
+                        if (!exactMatches.isEmpty()) {
+                            if (exactMatches.size() == 1) {
+                                int barcode = exactMatches.get(0);
+                                boolean isRemoved = library.removeBookById(barcode);
+                                if (isRemoved) {
+                                    logMessage("[INFO]", "Book removed successfully!");
+                                } else {
+                                    logMessage("[ERROR]", "Failed to remove book. Please try again later.");
+                                }
+                            } else {
+                                System.out.println("Multiple exact matches found. Barcodes: " + exactMatches.toString());
+                                System.out.print("Enter the Barcode of the book you want to remove, or type 'cancel' to cancel: ");
+                                String input = scanner.nextLine();
+                
+                                if ("cancel".equalsIgnoreCase(input)) {
+                                    logMessage("[INFO]", "Operation cancelled.");
+                                    return;
+                                }
+                
+                                try {
+                                    int chosenBarcode = Integer.parseInt(input);
+                                    if (exactMatches.contains(chosenBarcode)) {
+                                        boolean isRemoved = library.removeBookById(chosenBarcode);
+                                        if (isRemoved) {
+                                            logMessage("[INFO]", "Book removed successfully!");
+                                        } else {
+                                            logMessage("[ERROR]", "Failed to remove book. Please try again later.");
+                                        }
+                                    } else {
+                                        logMessage("[ERROR]", "Invalid Barcode selected.");
+                                    }
+                                } catch (NumberFormatException e) {
+                                    logMessage("[ERROR]", "Invalid input. Please enter a valid Barcode.");
+                                }
+                            }
+                        } else {
+                            logMessage("[INFO]", "No books with that title exist.");
+                        }
+                    } else {
+                        logMessage("[ERROR]", "Invalid choice. Please enter 1 or 2.");
+                    }
+                }
+                
+
+               
                /**checkOutBookByTitle
              * Checks out a book by title.
              *
@@ -403,6 +468,8 @@ public class Main {
                             int barcode = exactMatches.get(0);
                             if (library.changeBookStatus(library.getIndexByBarcode(barcode), true)) {
                                 logMessage("[INFO]", "Book checked out successfully!");
+                                LocalDate today = LocalDate.now();
+                                library.getBookByBarcode(barcode).setDueDate(today.plusDays(7).toString());
                                 return;
                             } else {
                                 logMessage("[ERROR]", "Failed to check out book. Please try again later.");
@@ -424,6 +491,8 @@ public class Main {
                                     // Check out the chosen book by its barcode.
                                     if (library.changeBookStatus(library.getIndexByBarcode(chosenBarcode), true)) {
                                         logMessage("[INFO]", "Book checked out successfully!");
+                                        LocalDate today = LocalDate.now();
+                                library.getBookByBarcode(chosenBarcode).setDueDate(today.plusDays(7).toString());
                                         return;
                                     } else {
                                         logMessage("[ERROR]", "Failed to check out book. Please try again later.");
@@ -452,6 +521,8 @@ public class Main {
                                 // Check out the chosen book from the close matches by its barcode.
                                 if (library.changeBookStatus(library.getIndexByBarcode(chosenBarcode), true)) {
                                     logMessage("[INFO]", "Book checked out successfully!");
+                                    LocalDate today = LocalDate.now();
+                                    library.getBookByBarcode(chosenBarcode).setDueDate(today.plusDays(7).toString());
                                 } else {
                                     logMessage("[ERROR]", "Failed to check out book. Please try again later.");
                                 }
@@ -507,6 +578,7 @@ public class Main {
                             int barcode = exactMatches.get(0);
                             if (library.changeBookStatus(library.getIndexByBarcode(barcode), false)) {
                                 logMessage("[INFO]", "Book checked in successfully!");
+                                library.getBookByBarcode(barcode).setDueDate("");
                                 return;
                             } else {
                                 logMessage("[ERROR]", "Failed to check in book. Please try again later.");
@@ -528,6 +600,7 @@ public class Main {
                                     // Check in the chosen book by its barcode.
                                     if (library.changeBookStatus(library.getIndexByBarcode(chosenBarcode), false)) {
                                         logMessage("[INFO]", "Book checked in successfully!");
+                                library.getBookByBarcode(chosenBarcode).setDueDate("");
                                         return;
                                     } else {
                                         logMessage("[ERROR]", "Failed to check in book. Please try again later.");
@@ -556,6 +629,7 @@ public class Main {
                                 // Check in the chosen book from the close matches by its barcode.
                                 if (library.changeBookStatus(library.getIndexByBarcode(chosenBarcode), false)) {
                                     logMessage("[INFO]", "Book checked in successfully!");
+                                library.getBookByBarcode(chosenBarcode).setDueDate("");
                                 } else {
                                     logMessage("[ERROR]", "Failed to check in book. Please try again later.");
                                 }
