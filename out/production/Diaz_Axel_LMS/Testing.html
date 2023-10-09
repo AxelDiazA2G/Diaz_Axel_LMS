@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Testing Plan for Library Management System (LMS)</title>
+</head>
+<body>
+
+    <h1>In-Depth Testing Plan for Library Management System (LMS)</h1>
+
+    <h2>Introduction</h2>
+    <p>The Library Management System (LMS) is a console-based application that aims to manage a library's book inventory. This document serves as a comprehensive testing plan, outlining the methodologies, objectives, and scope for all testing activities related to the LMS project.</p>
+
+    <h2>Test Objectives</h2>
+    <ul>
+        <li>Validate that all functionalities adhere to the specified requirements.</li>
+        <li>Ensure seamless interaction between integrated components.</li>
+        <li>Evaluate the system's performance metrics.</li>
+        <li>Identify and mitigate any security vulnerabilities.</li>
+    </ul>
+
+    <h2>Scope</h2>
+    <p>The scope encompasses:</p>
+    <ul>
+        <li>Unit tests for individual methods in the <code>Library</code> and <code>Main</code> classes.</li>
+        <li>Integration tests for the interaction between <code>Library</code> and <code>Main</code>.</li>
+        <li>Functional tests for complete user scenarios.</li>
+        <li>Performance tests for system behavior under different loads.</li>
+        <li>Security tests for potential vulnerabilities.</li>
+    </ul>
+
+    <h2>Testing Strategy</h2>
+
+    <h3>1. Unit Testing</h3>
+    <p><strong>Tool</strong>: JUnit</p>
+    <h4>Pseudocode: Testing <code>addBooksFromFile</code> method</h4>
+    <pre>
+Initialize a new Library object
+Set filePath to "Test Cases/test_case_1.txt"
+Call addBooksFromFile(filePath, 1000) and store the result in a variable
+Assert that the result is an empty string, indicating success
+    </pre>
+
+    <h3>2. Integration Testing</h3>
+    <p><strong>Tool</strong>: Mockito</p>
+    <h4>Pseudocode: Testing interaction between <code>Library</code> and <code>Main</code></h4>
+    <pre>
+Mock a Library object
+Mock a Scanner object for user input
+Invoke the Main method that calls addBooksFromFile in Library
+Verify that addBooksFromFile was called on the Library mock object
+    </pre>
+
+    <h3>3. Functional Testing</h3>
+    <p><strong>Tool</strong>: Manual Testing (Simulated User Input)</p>
+    <h4>Pseudocode: Testing the Main Menu</h4>
+    <pre>
+Simulate user input for navigating the main menu
+Invoke the Main method that handles user input for menu navigation
+Assert that the correct methods are called based on user input
+    </pre>
+
+    <h3>4. Performance Testing</h3>
+    <p><strong>Tool</strong>: Manual Testing (Loops for Multiple Users)</p>
+    <h4>Pseudocode: Test for Loading Many Books</h4>
+    <pre>
+Initialize a new Library object
+Loop to add a large number of books (e.g., 10,000) to the library
+Measure the time taken to complete the operation
+Assert that the time is within acceptable limits
+    </pre>
+
+    <h3>5. Security Testing</h3>
+    <p><strong>Tool</strong>: Manual Testing (Input Validation)</p>
+    <h4>Pseudocode: Test for Invalid File Paths</h4>
+    <pre>
+Initialize a new Library object
+Set filePath to an invalid or malicious string
+Call addBooksFromFile(filePath, 1000)
+Assert that the method handles the invalid input gracefully
+    </pre>
+
+    <h2>Test Deliverables</h2>
+    <p>The deliverables produced during the testing process will include:</p>
+    <ul>
+        <li>Test plans</li>
+        <li>Test cases</li>
+        <li>Test scripts</li>
+        <li>Test data sets</li>
+        <li>Defect and issue reports</li>
+    </ul>
+
+    <h2>Test Execution</h2>
+    <p>The test cases will be executed in accordance with the tools and methodologies specified under each type of testing. Test data will be either manually generated or programmatically created based on the requirements and individual test cases.</p>
+
+    <footer>
+        <p>This document is intended to be a dynamic resource, updated as the project evolves and as new testing requirements emerge. It provides a comprehensive roadmap for ensuring that the LMS project meets its quality objectives through rigorous testing.</p>
+    </footer>
+
+</body>
+</html>
