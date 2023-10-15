@@ -1,4 +1,5 @@
 import java.util.HashMap;
+import java.time.LocalDate;
 
 /**Axel Diaz | CEN 3024C Software Development | - CRN: 17125
  * Book
@@ -18,7 +19,7 @@ public class Book
           this.title = title;
           this.author = author;
           this.status = false;
-          this.dueDate = "";
+          this.dueDate = null;
      }
 
      /**
@@ -74,7 +75,17 @@ public class Book
       *
       * @param author The new status.
       */
-     public void setStatus(boolean status) { this.status = status; }
+     public void setStatus(boolean status) {
+
+          this.status = status;
+          if (!status) {
+               this.dueDate = null;
+          }else {
+               LocalDate today = LocalDate.now();
+               setDueDate(today.plusDays(28).toString());
+          }
+     }
+
 
      /**
       * Sets the due date of the book.
