@@ -468,8 +468,7 @@ public class Main {
                             int barcode = exactMatches.get(0);
                             if (library.changeBookStatus(library.getIndexByBarcode(barcode), true)) {
                                 logMessage("[INFO]", "Book checked out successfully!");
-                                LocalDate today = LocalDate.now();
-                                library.getBookByBarcode(barcode).setDueDate(today.plusDays(28).toString());
+                                
                                 return;
                             } else {
                                 logMessage("[ERROR]", "Failed to check out book. Please try again later.");
