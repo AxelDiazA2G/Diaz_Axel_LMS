@@ -1,5 +1,5 @@
 # 📚 Library Management System (LMS) By Axel Diaz
-# Phase 1
+# Phase 2
 ![](https://github.com/AxelDiazA2G/Diaz_Axel_LMS/blob/main/Video_Recording/Recording%202023-11-01%20032155.gif)
 
 ## 🎯 Objective and Description
