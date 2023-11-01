@@ -32,6 +32,7 @@ public class Library
           File inputFile = new File(filePath);
           ArrayList<Book> bookBatch = new ArrayList<>();
           int skippedLineCount = 0;
+          int validBooks=0;
           HashSet<Integer> uniqueBookIds = new HashSet<>();
           StringBuilder errorSummary = new StringBuilder();
 
@@ -102,6 +103,7 @@ public class Library
 
                          // Create a new Book object and add it to the batch
                          Book newBook = new Book(bookId, bookTitle, bookAuthor);
+                         validBooks++;
                          bookBatch.add(newBook);
 
                          // If the batch size is reached, add all books in the batch to
@@ -128,6 +130,11 @@ public class Library
                errorSummary.append("Error: Insufficient permissions to read the file.");
           } catch (Exception e) {
                errorSummary.append("An unexpected error occurred: " + e.getMessage());
+          }
+
+          if (validBooks==0){
+               errorSummary.append("No Valid Books Added");
+               return errorSummary.toString();
           }
 
           if (skippedLineCount > 0) {
@@ -318,62 +325,23 @@ public class Library
       *
       * @param page       The page number.
       * @param pageSize   The number of books to display per page.
-      * @param rowFormat  The format for displaying each book row.
       */
-     public void listAllBooks(int page, int pageSize, int dynamicWidth)
-     {
+     public Object[][] listAllBooks(int page, int pageSize) {
           int start = page * pageSize;
           int end = Math.min(start + pageSize, books.size());
 
-          int idWidth;
-          if (String.valueOf(getMaxId()).length() > 10) {
-               idWidth = String.valueOf(getMaxId()).length();
-          } else {
-               idWidth = 7;
-          };
-          int titleWidth = getMaxTitleLength();
-          int authorWidth = getMaxAuthorLength();
-          int statusWidth = 5;
-          int dueDateWidth = 10;
+          Object[][] tableData = new Object[end - start][5];
 
-          // Adding 8 for the four '|' separators and spaces
-          int contentWidth =
-            idWidth + titleWidth + authorWidth + statusWidth + dueDateWidth + 8;
-          int remainingSpace = dynamicWidth - contentWidth;
-
-          int extraSpaceForTitle = remainingSpace / 2;
-          int extraSpaceForAuthor = remainingSpace / 2;
-
-          if (remainingSpace % 2 != 0) {
-               extraSpaceForTitle += 1;
-          }
-
-          // Create a format string that respects the dynamicWidth
-          String rowFormat = "| %-" + idWidth + "s | %-" +
-                             (titleWidth + extraSpaceForTitle) + "s | %-" +
-                             (authorWidth + extraSpaceForAuthor) + "s | %-" +
-                             statusWidth + "s | %-" + dueDateWidth + "s |";
-
-          for (int i = start; i < end; i++) {
+          for (int i = start, j = 0; i < end; i++, j++) {
                Book book = books.get(i);
-               // Use String.format to ensure extra spaces are added at the correct
-               // positions
-               String formattedTitle = String.format(
-                 "%-" + (titleWidth + extraSpaceForTitle) + "s", book.getTitle());
-               String formattedAuthor = String.format(
-                 "%-" + (authorWidth + extraSpaceForAuthor) + "s", book.getAuthor());
-               String formattedStatus = String.format("%-" + statusWidth + "s",
-                                                      String.valueOf(book.getStatus()));
-               String formattedDueDate =
-                 String.format("%-" + dueDateWidth + "s", book.getDueDate());
-               System.out.printf(rowFormat,
-                                 book.getId(),
-                                 formattedTitle,
-                                 formattedAuthor,
-                                 formattedStatus,
-                                 formattedDueDate);
-               System.out.println();
+               tableData[j][0] = book.getId();
+               tableData[j][1] = book.getTitle();
+               tableData[j][2] = book.getAuthor();
+               tableData[j][3] = book.getStatus();
+               tableData[j][4] = book.getDueDate();
           }
+
+          return tableData;
      }
      /**getBookByIndex
       * Gets a book by its index in the ArrayList.
@@ -392,7 +360,6 @@ public class Library
      /**getBookByBarcode
       * Gets a book by its Barcode in the ArrayList.
       *
-      * @param index The index of the book.
       * @return The book, or {@code null} if the index is out of bounds.
       */
      public Book getBookByBarcode(int barcode)
