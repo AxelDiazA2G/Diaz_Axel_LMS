@@ -14,6 +14,13 @@ import javax.swing.event.TreeWillExpandListener;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.tree.ExpandVetoException;
 
+/**
+ * Axel Diaz | CEN 3024C Software Development | - CRN: 17125
+ * TestCaseSelector
+ * The TestCaseSelector class provides a user interface for selecting test case files
+ * from a directory using a JTree component. It allows users to browse through folders,
+ * select test case files, and continue with the selected file for further processing.
+ */
 public class TestCaseSelector {
     private JPanel panel1;
     private JTree tree1;
@@ -25,6 +32,10 @@ public class TestCaseSelector {
 
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
+    /**
+     * Constructor for the TestCaseSelector class.
+     * Initializes the user interface components and sets up event listeners.
+     */
     public TestCaseSelector() {
         // Main panel settings
         panel1 = new JPanel(new BorderLayout(30, 30));
@@ -64,11 +75,11 @@ public class TestCaseSelector {
         southPanel.add(pathTextField, BorderLayout.CENTER);
         southPanel.add(continueButton, BorderLayout.EAST);
 
-        // Add to main panel
+        // Add to the main panel
         panel1.add(treePanel, BorderLayout.CENTER);
         panel1.add(southPanel, BorderLayout.SOUTH);
 
-// Update the text field when a node in the tree is selected
+        // Update the text field when a node in the tree is selected
         tree1.addTreeSelectionListener(e -> {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree1.getLastSelectedPathComponent();
             if (node == null) return;
@@ -95,7 +106,6 @@ public class TestCaseSelector {
             tree1.expandRow(0);
         });
 
-
         File fileRoot = new File("./Test Cases");
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(new FileNode(fileRoot.getName(), fileRoot.getAbsolutePath()));
         tree1.setModel(new DefaultTreeModel(root));
@@ -103,6 +113,8 @@ public class TestCaseSelector {
         continueButton.addActionListener(e -> {
             selectedFile = fileHolder;
         });
+
+        // Mouse listener for expanding and selecting files
         tree1.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -127,7 +139,7 @@ public class TestCaseSelector {
             }
         });
 
-        // New TreeWillExpandListener
+        // TreeWillExpandListener to populate nodes on expand
         tree1.addTreeWillExpandListener(new TreeWillExpandListener() {
             @Override
             public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
@@ -148,9 +160,15 @@ public class TestCaseSelector {
             }
         });
 
+        // Populate the root node with initial content
         populateNode(root, fileRoot);
     }
 
+    /**
+     * CustomTreeNode
+     * CustomTreeNode extends DefaultMutableTreeNode to provide custom behavior
+     * for determining whether a node is a leaf node or not based on the associated file.
+     */
     public static class CustomTreeNode extends DefaultMutableTreeNode {
         public CustomTreeNode(Object userObject) {
             super(userObject);
@@ -168,6 +186,12 @@ public class TestCaseSelector {
         }
     }
 
+    /**
+     * Populates a tree node with child nodes representing files and folders.
+     *
+     * @param node The node to populate.
+     * @param file The file or folder associated with the node.
+     */
     private void populateNode(DefaultMutableTreeNode node, File file) {
         executorService.submit(() -> {
             if (file.isDirectory()) {
@@ -194,12 +218,20 @@ public class TestCaseSelector {
         });
     }
 
-
-
+    /**
+     * Returns the main panel of the TestCaseSelector.
+     *
+     * @return The main panel.
+     */
     public JPanel getPanel1() {
         return panel1;
     }
 
+    /**
+     * Gets the selected test case file.
+     *
+     * @return The selected test case file.
+     */
     public File getSelectedFile() {
         return selectedFile;
     }

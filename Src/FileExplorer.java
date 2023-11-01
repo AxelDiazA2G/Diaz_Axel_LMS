@@ -14,7 +14,11 @@ import javax.swing.event.TreeWillExpandListener;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.tree.ExpandVetoException;
 
-
+/**
+ * Axel Diaz | CEN 3024C Software Development | - CRN: 17125
+ * FileExplorer
+ * The FileExplorer class provides a user interface for browsing and selecting files and folders.
+ */
 public class FileExplorer {
     private JPanel panel1;
     private JTree tree1;
@@ -26,6 +30,10 @@ public class FileExplorer {
 
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
+    /**
+     * Constructor for the FileExplorer class.
+     * Initializes the user interface components and sets up event listeners.
+     */
     public FileExplorer() {
         // Main panel settings
         panel1 = new JPanel(new BorderLayout(30, 30));
@@ -69,7 +77,7 @@ public class FileExplorer {
         panel1.add(treePanel, BorderLayout.CENTER);
         panel1.add(southPanel, BorderLayout.SOUTH);
 
-// Update the text field when a node in the tree is selected
+        // Update the text field when a node in the tree is selected
         tree1.addTreeSelectionListener(e -> {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree1.getLastSelectedPathComponent();
             if (node == null) return;
@@ -152,6 +160,11 @@ public class FileExplorer {
         populateNode(root, fileRoot);
     }
 
+    /**
+     * CustomTreeNode
+     * A custom tree node class that extends DefaultMutableTreeNode.
+     * Provides custom behavior for determining if a node is a leaf.
+     */
     public static class CustomTreeNode extends DefaultMutableTreeNode {
         public CustomTreeNode(Object userObject) {
             super(userObject);
@@ -169,6 +182,12 @@ public class FileExplorer {
         }
     }
 
+    /**
+     * Populate the given node with child nodes representing files and folders within the specified directory.
+     *
+     * @param node The parent node to populate.
+     * @param file The directory to scan for files and folders.
+     */
     private void populateNode(DefaultMutableTreeNode node, File file) {
         executorService.submit(() -> {
             if (file.isDirectory()) {
@@ -195,12 +214,20 @@ public class FileExplorer {
         });
     }
 
-
-
+    /**
+     * Get the main panel of the FileExplorer.
+     *
+     * @return The main panel.
+     */
     public JPanel getPanel1() {
         return panel1;
     }
 
+    /**
+     * Get the selected file or folder.
+     *
+     * @return The selected file or folder.
+     */
     public File getSelectedFile() {
         return selectedFile;
     }

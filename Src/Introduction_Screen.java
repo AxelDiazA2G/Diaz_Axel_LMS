@@ -5,6 +5,13 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * Axel Diaz | CEN 3024C Software Development | - CRN: 17125
+ * Introduction_Screen
+ * The Introduction_Screen class provides a user interface for users to select
+ * between loading a file or loading test cases for the LMS (Learning Management System)
+
+ */
 public class Introduction_Screen {
     private JPanel panel1;
     private JRadioButton loadFileRadioButton;
@@ -12,6 +19,10 @@ public class Introduction_Screen {
     private JButton button1;
     private int selectedChoice;
 
+    /**
+     * Constructor for the Introduction_Screen class.
+     * Initializes the user interface components and sets up event listeners.
+     */
     public Introduction_Screen() {
         // Main panel settings
         panel1 = new JPanel();
@@ -20,7 +31,7 @@ public class Introduction_Screen {
         panel1.setBackground(new Color(240, 248, 255));
 
         // Title label
-        JLabel titleLabel = new JLabel("Welcome to the LMS for Valencia College");
+        JLabel titleLabel = new JLabel("<html><div style='text-align: center;'>Welcome to the LMS for Valencia College<br> By Axel Diaz</div></html>");
         titleLabel.setFont(new Font("Verdana", Font.BOLD, 24));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         panel1.add(titleLabel, BorderLayout.NORTH);
@@ -57,7 +68,7 @@ public class Introduction_Screen {
         button1.setFocusPainted(false);
         button1.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        // Add to main panel
+        // Add to the main panel
         panel1.add(radioPanel, BorderLayout.CENTER);
         panel1.add(button1, BorderLayout.SOUTH);
 
@@ -70,15 +81,24 @@ public class Introduction_Screen {
                 } else if (loadTestCasesRadioButton.isSelected()) {
                     selectedChoice = 2;
                 }
-                // Additional logic here
             }
         });
     }
 
+    /**
+     * Returns the main panel of the Introduction_Screen.
+     *
+     * @return The main panel.
+     */
     public JPanel getPanel1() {
         return panel1;
     }
 
+    /**
+     * Gets the selected choice (1 for Load File, 2 for Load Test Cases).
+     *
+     * @return The selected choice.
+     */
     public int getSelectedChoice() {
         return selectedChoice;
     }

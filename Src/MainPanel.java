@@ -5,6 +5,13 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.table.DefaultTableModel;
 
+/**
+ *   Axel Diaz | CEN 3024C Software Development | - CRN: 17125
+ * MainPanel
+ * The MainPanel class represents the graphical user interface (GUI) panel for managing books
+ * within a Library Management System (LMS). It provides functionality for deleting and checking
+ * in/out books, displaying book information in a table, and handling user interactions.
+ */
 public class MainPanel {
     private JPanel panel1;
     private JTabbedPane tabbedPane1;
@@ -17,6 +24,11 @@ public class MainPanel {
     private JTextField checkByBarcodeField;
     private JTextField checkByTitleField;
 
+    /**
+     * Constructor
+     *
+     * @param library The Library instance to interact with.
+     */
     public MainPanel(Library library) {
         panel1 = new JPanel(new BorderLayout(10, 10));
         panel1.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));  // Padding
@@ -43,6 +55,12 @@ public class MainPanel {
         panel1.add(exitButton, BorderLayout.EAST);
     }
 
+    /**
+     * Creates the panel for deleting books.
+     *
+     * @param library The Library instance to interact with.
+     * @return The delete books panel.
+     */
     private JPanel createDeleteBooksPanel(Library library) {
         JPanel panel = new JPanel(new GridLayout(3, 1, 5, 5));
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));  // Padding
@@ -53,6 +71,11 @@ public class MainPanel {
     }
 
 
+    /**
+     * Handles the deletion of books based on user input.
+     *
+     * @param library The Library instance to interact with.
+     */
     private void handleDeleteBook(Library library) {
         String barcode = deleteByBarcodeField.getText().trim();
         String title = deleteByTitleField.getText().trim();
@@ -108,6 +131,12 @@ public class MainPanel {
         }
     }
 
+    /**
+     * Creates the panel for checking in/out books.
+     *
+     * @param library The Library instance to interact with.
+     * @return The check in/out panel.
+     */
     private JPanel createCheckInOutPanel(Library library) {
         JPanel panel = new JPanel(new GridLayout(3, 1, 5, 5));
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));  // Padding
@@ -117,6 +146,11 @@ public class MainPanel {
         return panel;
     }
 
+    /**
+     * Handles the check in/out of books based on user input.
+     *
+     * @param library The Library instance to interact with.
+     */
     private void handleCheckInOut(Library library) {
         String barcodeInput = checkByBarcodeField.getText().trim();
         String title = checkByTitleField.getText().trim();
@@ -161,6 +195,12 @@ public class MainPanel {
     }
 
 
+        /**
+     * Reverses the status of a book based on its barcode.
+     *
+     * @param library The Library instance to interact with.
+     * @param barcode The barcode of the book to reverse the status of.
+     */
     private void reverseBookStatus(Library library, int barcode) {
         Integer index = library.getIndexByBarcode(barcode);
         Book book = library.getBookByBarcode(barcode);
@@ -189,18 +229,36 @@ public class MainPanel {
         }
     }
 
+    /**
+     * Sets the due date for a book based on its barcode.
+     *
+     * @param library The Library instance to interact with.
+     * @param barcode The barcode of the book to set the due date for.
+     */
     private void setDueDate(Library library, int barcode) {
         Book book = library.getBookByBarcode(barcode);
         LocalDate today = LocalDate.now();
         book.setDueDate(today.plusDays(28).toString());
     }
 
+    /**
+     * Clears the due date for a book based on its barcode.
+     *
+     * @param library The Library instance to interact with.
+     * @param barcode The barcode of the book to clear the due date for.
+     */
     private void clearDueDate(Library library, int barcode) {
         Book book = library.getBookByBarcode(barcode);
         book.setDueDate(null);
     }
 
-
+    /**
+     * Adds a text field with a titled border to a JPanel.
+     *
+     * @param panel The JPanel to add the text field to.
+     * @param title The title for the text field border.
+     * @return The added text field.
+     */
     private JTextField addTextFieldWithBorder(JPanel panel, String title) {
         JTextField textField = new JTextField();
         textField.setBorder(BorderFactory.createTitledBorder(title));
@@ -208,12 +266,24 @@ public class MainPanel {
         return textField;
     }
 
+    /**
+     * Adds a "Delete" button to a JPanel and attaches an action listener to it.
+     *
+     * @param panel   The JPanel to add the button to.
+     * @param library The Library instance to interact with.
+     */
     private void addDeleteButtonToPanel(JPanel panel, Library library) {
         JButton deleteButton = new JButton("Delete");
         deleteButton.addActionListener(e -> handleDeleteBook(library));
         panel.add(deleteButton);
     }
 
+    /**
+     * Adds a "Continue" button to a JPanel and attaches an action listener to it.
+     *
+     * @param panel   The JPanel to add the button to.
+     * @param library The Library instance to interact with.
+     */
     private void addContinueButtonToPanel(JPanel panel, Library library) {
         JButton continueButton = new JButton("Continue");
         continueButton.addActionListener(e -> handleCheckInOut(library));
@@ -222,10 +292,21 @@ public class MainPanel {
 
 
 
+
+    /**
+     * Gets the main panel of the GUI.
+     *
+     * @return The main panel.
+     */
     public JPanel getPanel1() {
         return panel1;
     }
 
+    /**
+     * Populates the table with book information from the Library.
+     *
+     * @param library The Library instance to fetch book data from.
+     */
     public void populateTable(Library library) {
         Object[][] tableData = library.listAllBooks(0, 50);  // Adjust these arguments as needed
         System.out.println("Number of books fetched: " + tableData.length);  // Logging
