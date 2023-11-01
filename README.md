@@ -1,6 +1,6 @@
 # 📚 Library Management System (LMS) By Axel Diaz
 # Phase 1
-![](https://github.com/AxelDiazA2G/Diaz_Axel_LMS/blob/main/Video_Recording/Recording-2023-10-08-160536.gif)
+![](https://github.com/AxelDiazA2G/Diaz_Axel_LMS/blob/main/Video_Recording/Recording%202023-11-01%20032155.gif)
 
 ## 🎯 Objective and Description
 The Library Management System (LMS) aims to streamline the operations of a library by automating the management of its book collection. Designed as a console-based application, the LMS empowers librarians to efficiently add or remove books and allows readers to browse the collection. The system adheres to specific constraints, such as utilizing a text-file format for book data, to ensure ease of use and scalability.
@@ -26,7 +26,6 @@ The Library Management System (LMS) aims to streamline the operations of a libra
 
 ## ⚙️ Constraints
 
-- 💻 **Console-Based**: Runs in terminal.
 - 📄 **Text File Format**: CSV-like format for book data.
 
 ---
