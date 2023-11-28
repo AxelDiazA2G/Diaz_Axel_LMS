@@ -1,4 +1,5 @@
 # 📚 Library Management System (LMS) By Axel Diaz
+
 # Phase 3
 
 ## 🎯 Objective and Description
@@ -6,7 +7,7 @@ The Library Management System (LMS) aims to streamline the operations of a libra
 ---
 ## 🌟 Key Features
 
-- 🗑️ **Remove Books**: By unique Barcode.
+- 🗑️ **Remove Books**: By unique Barcode or Title.
 - 📑 **List Books**: View entire collection.
 - ☑️ **Check out book**: Take a book
 - ✅ **Check in book**: Deliver a book
@@ -24,8 +25,10 @@ The Library Management System (LMS) aims to streamline the operations of a libra
 
 ## ⚙️ Constraints
 
+
 - 💻 **Console-Based**: Runs in terminal.
 - 📄 **MySQL**: Database for book data.
+
 
 ---
 
