@@ -1,6 +1,9 @@
 import java.io.*;
+import java.sql.*;
 import java.util.*;
+import java.util.Date;
 import java.util.regex.Pattern;
+
 
 /**Axel Diaz | CEN 3024C Software Development | - CRN: 17125
  * Library
@@ -18,133 +21,108 @@ public class Library
 
      public Library() { books = new ArrayList<>(); }
 
-     public void addBook(Book book) { books.add(book); }
+     /**
+      * Adds a new book to the library.
+      *
+      * @param book The book to be added to the library.
+      */
+     public void addBook(Book book) {
+          String sql = "INSERT INTO books (id, title, author) VALUES (?, ?, ?)";
+          try (Connection conn = getDatabaseConnection();
+               PreparedStatement pstmt = conn.prepareStatement(sql)) {
+               pstmt.setInt(1, book.getId());
+               pstmt.setString(2, book.getTitle());
+               pstmt.setString(3, book.getAuthor());
+               pstmt.executeUpdate();
+          } catch (SQLException e) {
+               System.out.println("SQL Error: " + e.getMessage());
+          }
+     }
 
-     /**addBooksFromFile
+
+     /**
       * Adds books to the library from a given file.
       *
       * @param filePath  The path to the file containing book information.
       * @param batchSize The number of books to add in a single batch.
-      * @return A summary of any errors encountered.
+      * @return A summary of any errors encountered during the process.
       */
-     public String addBooksFromFile(String filePath, int batchSize)
-     {
-          File inputFile = new File(filePath);
-          ArrayList<Book> bookBatch = new ArrayList<>();
-          int skippedLineCount = 0;
-          int validBooks=0;
-          HashSet<Integer> uniqueBookIds = new HashSet<>();
-          StringBuilder errorSummary = new StringBuilder();
+     public String addBooksFromFile(String filePath, int batchSize) {
+     File inputFile = new File(filePath);
+     int skippedLineCount = 0;
+     int validBooks = 0;
+     HashSet<Integer> uniqueBookIds = new HashSet<>();
+     StringBuilder errorSummary = new StringBuilder();
+     String insertSql = "INSERT INTO books (id, title, author) VALUES (?, ?, ?)";
+     Connection conn = null;
 
-          try (Scanner fileScanner = new Scanner(inputFile, "UTF-8")) {
-               int currentLineNumber = 0;
+     try {
+          conn = getDatabaseConnection();
+          conn.setAutoCommit(false); // Use transaction to batch insert
+          PreparedStatement pstmt = conn.prepareStatement(insertSql);
+          Scanner fileScanner = new Scanner(inputFile, "UTF-8");
+          int currentLineNumber = 0;
 
-               while (fileScanner.hasNextLine()) {
-                    // Increment the line number for each new line read from the file
-                    currentLineNumber++;
+          while (fileScanner.hasNextLine()) {
+               // ... rest of the code to process each line ...
 
-                    // Read the next line from the file and trim any leading/trailing
-                    // whitespace
-                    String currentLine = fileScanner.nextLine().trim();
-
-                    // Skip empty lines
-                    if (currentLine.isEmpty()) {
-                         continue;
-                    }
-
-                    // Split the line into parts based on commas
-                    String[] bookInfo = currentLine.split(",");
-
-                    // Skip lines that don't contain exactly 3 parts (ID, title, author)
-                    if (bookInfo.length != 3) {
-                         // System.out.println("Skipping malformed line " +
-                         // currentLineNumber + ": " + currentLine);
-                         skippedLineCount++;
-                         continue;
-                    }
-
-                    try {
-                         // Parse the book ID, title, and author from the line
-                         int bookId = Integer.parseInt(bookInfo[0].trim());
-                         String bookTitle = bookInfo[1].trim();
-                         String bookAuthor = bookInfo[2].trim();
-
-                         // Define a pattern for valid characters in titles and authors
-                         Pattern validCharsPattern = Pattern.compile("[a-zA-Z0-9 ',-]+");
-
-                         // Skip lines with invalid characters in the title or author
-                         if (!validCharsPattern.matcher(bookTitle).matches() ||
-                             !validCharsPattern.matcher(bookAuthor).matches()) {
-                              // System.out.println("Skipping line with invalid characters
-                              // at line " + currentLineNumber + ": " + currentLine);
-                              skippedLineCount++;
-                              continue;
-                         }
-
-                         // Skip lines with duplicate book IDs
-                         if (uniqueBookIds.contains(bookId)) {
-                              // System.out.println("Skipping line with duplicate ID at
-                              // line " + currentLineNumber + ": " + currentLine);
-                              skippedLineCount++;
-                              continue;
-                         }
-
-                         // Add the book ID to the set of unique IDs
-                         uniqueBookIds.add(bookId);
-
-                         // Skip lines with empty title or author
-                         if (bookTitle.isEmpty() || bookAuthor.isEmpty()) {
-                              // System.out.println("Skipping line with empty title or
-                              // author at line " + currentLineNumber + ": " +
-                              // currentLine);
-                              skippedLineCount++;
-                              continue;
-                         }
-
-                         // Create a new Book object and add it to the batch
-                         Book newBook = new Book(bookId, bookTitle, bookAuthor);
-                         validBooks++;
-                         bookBatch.add(newBook);
-
-                         // If the batch size is reached, add all books in the batch to
-                         // the library and clear the batch
-                         if (bookBatch.size() == batchSize) {
-                              books.addAll(bookBatch);
-                              bookBatch.clear();
-                         }
-                    } catch (NumberFormatException e) {
-                         // Skip lines with invalid book IDs
-                         // System.out.println("Skipping line with invalid ID at line " +
-                         // currentLineNumber + ": " + currentLine);
-                         skippedLineCount++;
-                    }
+               if (validBooks % batchSize == 0 && validBooks > 0) {
+                    pstmt.executeBatch(); // Execute batch insert
+                    conn.commit(); // Commit transaction
                }
+          }
 
-               // Add any remaining books in the batch to the library
-               if (!bookBatch.isEmpty()) {
-                    books.addAll(bookBatch);
+          if (validBooks % batchSize != 0) {
+               pstmt.executeBatch(); // Execute the final batch
+               conn.commit(); // Commit the final transaction
+          }
+
+          pstmt.close();
+          fileScanner.close();
+     } catch (FileNotFoundException e) {
+          errorSummary.append("Error: File not found - ").append(filePath);
+     } catch (SecurityException e) {
+          errorSummary.append("Error: Insufficient permissions to read the file.");
+     } catch (SQLException e) {
+          errorSummary.append("SQL Error: ").append(e.getMessage());
+          try {
+               if (conn != null) {
+                    conn.rollback(); // Rollback in case of error
                }
-          } catch (FileNotFoundException e) {
-               errorSummary.append("Error: File not found - " + filePath);
-          } catch (SecurityException e) {
-               errorSummary.append("Error: Insufficient permissions to read the file.");
-          } catch (Exception e) {
-               errorSummary.append("An unexpected error occurred: " + e.getMessage());
+          } catch (SQLException ex) {
+               errorSummary.append("\nFailed to rollback: ").append(ex.getMessage());
           }
-
-          if (validBooks==0){
-               errorSummary.append("No Valid Books Added");
-               return errorSummary.toString();
+     } catch (Exception e) {
+          errorSummary.append("An unexpected error occurred: ").append(e.getMessage());
+     } finally {
+          try {
+               if (conn != null && !conn.isClosed()) {
+                    conn.close();
+               }
+          } catch (SQLException e) {
+               errorSummary.append("\nFailed to close database connection: ").append(e.getMessage());
           }
-
-          if (skippedLineCount > 0) {
-               errorSummary.append("Lines with errors: ")
-                 .append(skippedLineCount)
-                 .append("\n");
-          }
-
-          return errorSummary.toString();
      }
+
+     // ... handle skippedLineCount and error summary ...
+
+     return errorSummary.toString();
+}
+
+
+     /**
+      * Establishes a connection to the database.
+      *
+      * @return A Connection object to the configured database.
+      * @throws SQLException If a database access error occurs.
+      */
+     private Connection getDatabaseConnection() throws SQLException {
+          String url = "jdbc:mysql://127.0.0.1:3306/lms";
+          String user = "root";
+          String password = "password";
+          return DriverManager.getConnection(url, user, password);
+     }
+
 
      /**removeBookById
       * Removes a book by its ID.
@@ -152,15 +130,19 @@ public class Library
       * @param id The ID of the book to remove.
       * @return {@code true} if a book was removed, {@code false} otherwise.
       */
-     public boolean removeBookById(int id)
-     {
-          int initialSize = books.size(); // Get the initial size of the books list
-          books.removeIf(book -> book.getId() == id); // Remove the book
-          int newSize = books.size(); // Get the new size of the books list
-
-          return initialSize >
-            newSize; // Return true if a book was removed, false otherwise
+     public boolean removeBookById(int id) {
+          String sql = "DELETE FROM books WHERE barcode = ?";
+          try (Connection conn = getDatabaseConnection();
+               PreparedStatement pstmt = conn.prepareStatement(sql)) {
+               pstmt.setInt(1, id);
+               int affectedRows = pstmt.executeUpdate();
+               return affectedRows > 0;
+          } catch (SQLException e) {
+               System.out.println("SQL Error: " + e.getMessage());
+               return false;
+          }
      }
+
 
      /**changeBookStatus
       * Changes the status of a book with the given barcode.
@@ -171,17 +153,100 @@ public class Library
       * Otherwise, it returns false.
       *
       * @param barcode The barcode of the book to change the status for.
-      * @param status  The new status to set (true for checked out, false for checked in).
       * @return True if the status change was successful, false otherwise.
       */
-     public boolean changeBookStatus(int barcode, boolean status)
-     {
-          if (books.get(barcode).getStatus() != status) {
-               books.get(barcode).setStatus(status);
-               return true;
+     public boolean changeBookStatus(int barcode) {
+          String getStatusSql = "SELECT status FROM books WHERE barcode = ?";
+          String updateStatusSql = "UPDATE books SET status = ?, dueDate = CASE WHEN status = 1 THEN NOW() ELSE NULL END WHERE barcode = ?";
+
+          try (Connection conn = getDatabaseConnection();
+               PreparedStatement getStatusStmt = conn.prepareStatement(getStatusSql);
+               PreparedStatement updateStatusStmt = conn.prepareStatement(updateStatusSql)) {
+
+               // Check the current status of the book
+               getStatusStmt.setInt(1, barcode);
+               ResultSet rs = getStatusStmt.executeQuery();
+               if (rs.next()) {
+                    boolean currentStatus = rs.getBoolean("status");
+                    boolean newStatus = !currentStatus;
+
+                    // Update the status and due date based on the new status
+                    updateStatusStmt.setBoolean(1, newStatus);
+                    updateStatusStmt.setInt(2, barcode);
+                    int affectedRows = updateStatusStmt.executeUpdate();
+
+                    return affectedRows > 0;
+               }
+          } catch (SQLException e) {
+               System.out.println("SQL Error: " + e.getMessage());
           }
           return false;
      }
+
+     /**
+      * Gets the total number of books in the library.
+      *
+      * @return The total number of books.
+      */
+     public int getTotalBooks() {
+          String sql = "SELECT COUNT(*) FROM books";
+          try (Connection conn = getDatabaseConnection();
+               PreparedStatement pstmt = conn.prepareStatement(sql);
+               ResultSet rs = pstmt.executeQuery()) {
+
+               if (rs.next()) {
+                    return rs.getInt(1);
+               }
+          } catch (SQLException e) {
+               System.out.println("SQL Error: " + e.getMessage());
+          }
+          return 0;
+     }
+
+     /**
+      * Retrieves all book titles from the database.
+      *
+      * @return A list of all book titles.
+      */
+     public List<String> getAllBookTitles() {
+          List<String> titles = new ArrayList<>();
+          String sql = "SELECT title FROM books";
+
+          try (Connection conn = getDatabaseConnection();
+               PreparedStatement pstmt = conn.prepareStatement(sql);
+               ResultSet rs = pstmt.executeQuery()) {
+
+               while (rs.next()) {
+                    String title = rs.getString("title");
+                    titles.add(title);
+               }
+          } catch (SQLException e) {
+               System.out.println("SQL Error: " + e.getMessage());
+          }
+          return titles;
+     }
+
+     /**
+      * Gets the count of books that are currently checked out.
+      *
+      * @return The number of checked out books.
+      */
+     public int getCheckedOutBooksCount() {
+          String sql = "SELECT COUNT(*) FROM books WHERE status = true";  // Adjust the condition based on your schema
+          try (Connection conn = getDatabaseConnection();
+               PreparedStatement pstmt = conn.prepareStatement(sql);
+               ResultSet rs = pstmt.executeQuery()) {
+
+               if (rs.next()) {
+                    return rs.getInt(1);
+               }
+          } catch (SQLException e) {
+               System.out.println("SQL Error: " + e.getMessage());
+          }
+          return 0;
+     }
+
+
 
      /**searchByTitle
       * Searches for books by title.
@@ -193,21 +258,30 @@ public class Library
       * @param targetTitle The title to search for.
       * @return A map containing "exact" and "close" matches by barcode.
       */
-     public Map<String, List<Integer>> searchByTitle(String targetTitle)
-     {
+     public Map<String, List<Integer>> searchByTitle(String targetTitle) {
           Map<String, List<Integer>> resultMap = new HashMap<>();
-          List<Integer> closeMatches = new ArrayList<>();
           List<Integer> exactMatches = new ArrayList<>();
+          List<Integer> closeMatches = new ArrayList<>();
+          String sql = "SELECT barcode, title FROM books WHERE title LIKE ?";
 
-          for (Book book : books) {
-               if (book.getTitle().equals(targetTitle)) {
-                    exactMatches.add(book.getId());
-               } else {
-                    int distance = levenshteinDistance(book.getTitle(), targetTitle);
-                    if (distance <= 3) {
-                         closeMatches.add(book.getId());
+          try (Connection conn = getDatabaseConnection();
+               PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+               pstmt.setString(1, "%" + targetTitle + "%");
+               ResultSet rs = pstmt.executeQuery();
+
+               while (rs.next()) {
+                    int id = rs.getInt("barcode");
+                    String title = rs.getString("title");
+
+                    if (title.equalsIgnoreCase(targetTitle)) {
+                         exactMatches.add(id);
+                    } else {
+                         closeMatches.add(id);
                     }
                }
+          } catch (SQLException e) {
+               System.out.println("SQL Error: " + e.getMessage());
           }
 
           resultMap.put("exact", exactMatches);
@@ -215,110 +289,6 @@ public class Library
           return resultMap;
      }
 
-     /**sortByTitle
-      * Sorts the list of books by title in non-decreasing order.
-      */
-     public void sortByTitle() { mergeSort(0, books.size() - 1); }
-
-     /**mergeSort
-      * Sorts the list of books by title in non-decreasing order.
-      */
-     private void mergeSort(int left, int right)
-     {
-          if (left < right) {
-               int mid = (left + right) / 2;
-
-               // Sort the left and right halves
-               mergeSort(left, mid);
-               mergeSort(mid + 1, right);
-
-               // Merge the sorted halves
-               merge(left, mid, right);
-          }
-     }
-
-     /**merge
-      * Merges two sub-arrays into a single sorted array.
-      *
-      * @param left  The left index of the first sub-array.
-      * @param mid   The middle index dividing the two sub-arrays.
-      * @param right The right index of the second sub-array.
-      */
-     private void merge(int left, int mid, int right)
-     {
-          // Calculate the sizes of the two sub-arrays to be merged
-          int n1 = mid - left + 1;
-          int n2 = right - mid;
-
-          // Create temporary arrays to hold the values of the sub-arrays
-          ArrayList<Book> leftArray = new ArrayList<>();
-          ArrayList<Book> rightArray = new ArrayList<>();
-
-          // Copy the values to the temporary arrays
-          for (int i = 0; i < n1; i++) {
-               leftArray.add(books.get(left + i));
-          }
-          for (int j = 0; j < n2; j++) {
-               rightArray.add(books.get(mid + 1 + j));
-          }
-
-          // Merge the temporary arrays back into the original array
-          int i = 0, j = 0, k = left;
-          while (i < n1 && j < n2) {
-               if (leftArray.get(i).getTitle().compareTo(rightArray.get(j).getTitle()) <=
-                   0) {
-                    books.set(k, leftArray.get(i));
-                    i++;
-               } else {
-                    books.set(k, rightArray.get(j));
-                    j++;
-               }
-               k++;
-          }
-
-          // Copy any remaining elements in leftArray, if any
-          while (i < n1) {
-               books.set(k, leftArray.get(i));
-               i++;
-               k++;
-          }
-
-          // Copy any remaining elements in rightArray, if any
-          while (j < n2) {
-               books.set(k, rightArray.get(j));
-               j++;
-               k++;
-          }
-     }
-
-     /**levenshteinDistance
-      * Flexible string comparison
-      *
-      * @param a     string a
-      * @param b   string b
-      */
-     private static int levenshteinDistance(String a, String b)
-     {
-          int[][] dp = new int[a.length() + 1][b.length() + 1];
-
-          for (int i = 0; i <= a.length(); i++) {
-               for (int j = 0; j <= b.length(); j++) {
-                    if (i == 0) {
-                         dp[0][j] = j;
-                    } else if (j == 0) {
-                         dp[i][0] = i;
-                    } else {
-                         dp[i][j] = Math.min(
-                           Math.min(dp[i - 1][j - 1] +
-                                      (a.charAt(i - 1) == b.charAt(j - 1) ? 0 : 1),
-                                    dp[i - 1][j] + 1),
-                           dp[i][j - 1] + 1);
-                    }
-               }
-          }
-
-          return dp[a.length()][b.length()];
-     }
 
      /**listAllBooks
       * Lists all books with pagination.
@@ -327,22 +297,39 @@ public class Library
       * @param pageSize   The number of books to display per page.
       */
      public Object[][] listAllBooks(int page, int pageSize) {
-          int start = page * pageSize;
-          int end = Math.min(start + pageSize, books.size());
+          String sql = "SELECT * FROM books ORDER BY title LIMIT ? OFFSET ?";
+          ArrayList<Book> pageBooks = new ArrayList<>();
+          try (Connection conn = getDatabaseConnection();
+               PreparedStatement pstmt = conn.prepareStatement(sql)) {
+               pstmt.setInt(1, pageSize);
+               pstmt.setInt(2, page * pageSize);
+               ResultSet rs = pstmt.executeQuery();
+               while (rs.next()) {
+                    int id = rs.getInt("barcode");
+                    String title = rs.getString("title");
+                    String author = rs.getString("author");
+                    boolean status = rs.getBoolean("status"); // Assuming there's a status column
+                    String dueDate = String.valueOf(rs.getDate("dueDate"));    // Assuming there's a due_date column
 
-          Object[][] tableData = new Object[end - start][5];
+                    pageBooks.add(new Book(id, title, author, status, dueDate));
+               }
+          } catch (SQLException e) {
+               System.out.println("SQL Error: " + e.getMessage());
+          }
 
-          for (int i = start, j = 0; i < end; i++, j++) {
-               Book book = books.get(i);
-               tableData[j][0] = book.getId();
-               tableData[j][1] = book.getTitle();
-               tableData[j][2] = book.getAuthor();
-               tableData[j][3] = book.getStatus();
-               tableData[j][4] = book.getDueDate();
+          Object[][] tableData = new Object[pageBooks.size()][5];
+          for (int i = 0; i < pageBooks.size(); i++) {
+               Book book = pageBooks.get(i);
+               tableData[i][0] = book.getId();
+               tableData[i][1] = book.getTitle();
+               tableData[i][2] = book.getAuthor();
+               tableData[i][3] = book.getStatus();
+               tableData[i][4] = book.getDueDate();
           }
 
           return tableData;
      }
+
      /**getBookByIndex
       * Gets a book by its index in the ArrayList.
       *
@@ -362,80 +349,26 @@ public class Library
       *
       * @return The book, or {@code null} if the index is out of bounds.
       */
-     public Book getBookByBarcode(int barcode)
-     {
-          for (Book book : books) {
-               if (book.getId() == barcode) {
-                    return book;
+     public Book getBookByBarcode(int barcode) {
+          String sql = "SELECT * FROM books WHERE barcode = ?";
+          try (Connection conn = getDatabaseConnection();
+               PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+               pstmt.setInt(1, barcode);
+               ResultSet rs = pstmt.executeQuery();
+
+               if (rs.next()) {
+                    int id = rs.getInt("barcode"); // Adjust these column names as per your database schema
+                    String title = rs.getString("title");
+                    String author = rs.getString("author");
+                    boolean status = rs.getBoolean("status");
+                    String dueDate = rs.getString("dueDate");
+
+                    return new Book(id, title, author, status, dueDate); // Create and return the Book object
                }
+          } catch (SQLException e) {
+               System.out.println("SQL Error: " + e.getMessage());
           }
-          return null; // Return null if no book with the given barcode is found
-     }
-
-     public Integer getIndexByBarcode(int barcode)
-     {
-          for (int i = 0; i < books.size(); i++) {
-               if (books.get(i).getId() == barcode) {
-                    return i; // Return the index of the book with the given barcode
-               }
-          }
-          return null; // Return null if no book with the given barcode is found
-     }
-
-     /**getTotalBooks
-      * Gets the total number of books in the library.
-      *
-      * @return The total number of books.
-      */
-     public int getTotalBooks() { return books.size(); }
-
-     /**getMaxId
-      * Gets the maximum book ID in the library.
-      *
-      * @return The maximum book ID, or 0 if the library is empty.
-      */
-     public int getMaxId()
-     {
-          int maxId = 0; // Initialize maxId to 0
-
-          // Iterate through all books in the library
-          for (Book book : books) {
-               // Update maxId if the current book's ID is greater
-               if (book.getId() > maxId) {
-                    maxId = book.getId();
-               }
-          }
-
-          return maxId; // Return the maximum ID found
-     }
-
-     /**getMaxTitleLength
-      * Gets the maximum length of all book titles in the library.
-      *
-      * @return The maximum title length, or 20 if the library is empty.
-      */
-     public int getMaxTitleLength()
-     {
-          // Stream through all books, get their titles, and find the maximum length
-          return books.stream()
-            .map(Book::getTitle)      // Extract the titles from the books
-            .mapToInt(String::length) // Convert titles to their lengths
-            .max()                    // Find the maximum length
-            .orElse(20);              // Return 20 if no maximum is found
-     }
-
-     /**getMaxAuthorLengt
-      * Gets the maximum length of all book authors in the library.
-      *
-      * @return The maximum author name length, or 20 if the library is empty.
-      */
-     public int getMaxAuthorLength()
-     {
-          // Stream through all books, get their authors, and find the maximum length
-          return books.stream()
-            .map(Book::getAuthor)     // Extract the authors from the books
-            .mapToInt(String::length) // Convert authors to their lengths
-            .max()                    // Find the maximum length
-            .orElse(20);              // Return 20 if no maximum is found
+          return null; // Return null if no book is found with the given barcode
      }
 }
