@@ -19,26 +19,26 @@ public class Main extends JFrame {
         Scanner scanner = new Scanner(System.in);
         Introduction_Screen introductionScreen = new Introduction_Screen();
 
-        // Initialize JFrame for Introduction_Screen
-        JFrame introFrame = new JFrame("Introduction Screen");
-        introFrame.setContentPane(introductionScreen.getPanel1());
-        introFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        introFrame.pack();
-        introFrame.setVisible(true);
+        //Initialize JFrame for Introduction_Screen
+       JFrame introFrame = new JFrame("Introduction Screen");
+       introFrame.setContentPane(introductionScreen.getPanel1());
+       introFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+       introFrame.pack();
+       introFrame.setVisible(true);
 
-        TestCaseSelector testCaseSelector = new TestCaseSelector();
-        JFrame testCaseFrame = new JFrame("Test Case Selector");
-        testCaseFrame.setContentPane(testCaseSelector.getPanel1());
-        testCaseFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        testCaseFrame.pack();
-        testCaseFrame.setVisible(false);
+       TestCaseSelector testCaseSelector = new TestCaseSelector();
+       JFrame testCaseFrame = new JFrame("Test Case Selector");
+       testCaseFrame.setContentPane(testCaseSelector.getPanel1());
+       testCaseFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+       testCaseFrame.pack();
+       testCaseFrame.setVisible(false);
 
-        FileExplorer fileExplorer = new FileExplorer();
-        JFrame fileExplorerFrame = new JFrame("File Explorer");
-        fileExplorerFrame.setContentPane(fileExplorer.getPanel1());
-        fileExplorerFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        fileExplorerFrame.pack();
-        fileExplorerFrame.setVisible(false);
+       FileExplorer fileExplorer = new FileExplorer();
+       JFrame fileExplorerFrame = new JFrame("File Explorer");
+       fileExplorerFrame.setContentPane(fileExplorer.getPanel1());
+       fileExplorerFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+       fileExplorerFrame.pack();
+       fileExplorerFrame.setVisible(false);
 
         MainPanel mainPanel = new MainPanel(library);
         JFrame mainPanelFrame = new JFrame("Library Management System (LMS)");
@@ -47,7 +47,7 @@ public class Main extends JFrame {
         mainPanelFrame.pack();
         mainPanelFrame.setVisible(false);
 
-        init(introductionScreen, testCaseSelector, fileExplorer, introFrame, testCaseFrame, fileExplorerFrame, library);
+       init(introductionScreen, testCaseSelector, fileExplorer, introFrame, testCaseFrame, fileExplorerFrame, library);
 
         start(mainPanel, mainPanelFrame, library);
     }
