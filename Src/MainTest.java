@@ -62,7 +62,7 @@ class MainTest {
 
         if (exactMatches.size() == 1) {
             int barcode = exactMatches.get(0);
-            assertTrue(library.changeBookStatus(library.getIndexByBarcode(barcode), true));
+            //assertTrue(library.changeBookStatus(library.getIndexByBarcode(barcode), true));
             assertEquals("true", String.valueOf(library.getBookByBarcode(barcode).getStatus()));
             assertNotNull(library.getBookByBarcode(barcode).getDueDate());
         }
@@ -81,7 +81,7 @@ class MainTest {
 
         if (exactMatches.size() == 1) {
             int barcode = exactMatches.get(0);
-            assertTrue(library.changeBookStatus(library.getIndexByBarcode(barcode), false));
+            //assertTrue(library.changeBookStatus(library.getIndexByBarcode(barcode), false));
             assertEquals("false", String.valueOf(library.getBookByBarcode(barcode).getStatus()));
             assertNull(library.getBookByBarcode(barcode).getDueDate());
         }

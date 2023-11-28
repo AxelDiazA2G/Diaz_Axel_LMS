@@ -22,6 +22,15 @@ public class Book
           this.dueDate = null;
      }
 
+     public Book(int barcode, String title, String author,boolean status, String dueDate)
+     {
+          this.barcode = barcode;
+          this.title = title;
+          this.author = author;
+          this.status = status;
+          this.dueDate = dueDate;
+     }
+
      /**
       * Gets the barcode of the book.
       *
